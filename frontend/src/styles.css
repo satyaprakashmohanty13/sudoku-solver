@@ -1,0 +1,4 @@
+body { font-family: sans-serif; }
+.container { max-width: 600px; margin: auto; text-align: center; }
+.grid { display: grid; grid-template-columns: repeat(9, 1fr); gap: 2px; margin-top: 20px; }
+.cell { border: 1px solid #444; padding: 10px; font-size: 1.2em; }
