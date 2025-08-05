@@ -2,11 +2,53 @@
 <html>
 <head>
     <title>Sudoku Solver</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+        }
+        #loading {
+            display: none;
+            text-align: center;
+            font-weight: bold;
+        }
+        #loading::after {
+            content: " ⏳";
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0.5; }
+        }
+        img {
+            max-width: 100%;
+            margin-top: 10px;
+            display: none;
+            border: 1px solid #ccc;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            cursor: pointer;
+        }
+        pre {
+            background: #f7f7f7;
+            padding: 10px;
+            white-space: pre-wrap;
+        }
+    </style>
 </head>
 <body>
     <h1>Sudoku Solver</h1>
-    <input type="file" id="imageInput" accept="image/*" />
+
+    <input type="file" id="imageInput" accept="image/*" onchange="previewImage()" />
+    <br>
+    <img id="preview" alt="Image Preview" />
+
     <button onclick="solveSudoku()">Solve</button>
+
+    <div id="loading">Processing your Sudoku...</div>
 
     <h2>Initial Grid</h2>
     <pre id="initialGrid"></pre>
@@ -17,6 +59,19 @@
     <h3 id="status"></h3>
 
     <script>
+        const backendUrl = "https://satyaprakashmohanty13-ssb.hf.space/solve";
+
+        function previewImage() {
+            const fileInput = document.getElementById("imageInput");
+            const preview = document.getElementById("preview");
+            if (fileInput.files && fileInput.files[0]) {
+                preview.src = URL.createObjectURL(fileInput.files[0]);
+                preview.style.display = "block";
+            } else {
+                preview.style.display = "none";
+            }
+        }
+
         async function solveSudoku() {
             const fileInput = document.getElementById("imageInput");
             if (!fileInput.files.length) {
@@ -24,24 +79,37 @@
                 return;
             }
 
+            document.getElementById("loading").style.display = "block";
+            document.getElementById("initialGrid").innerText = "";
+            document.getElementById("solvedGrid").innerText = "";
+            document.getElementById("status").innerText = "";
+
             const formData = new FormData();
             formData.append("file", fileInput.files[0]);
 
-            const res = await fetch("https://satyaprakashmohanty13-ssb.hf.space/solve", {
-                method: "POST",
-                body: formData
-            });
+            try {
+                const res = await fetch(backendUrl, {
+                    method: "POST",
+                    body: formData
+                });
 
-            if (!res.ok) {
-                const err = await res.json();
-                alert(err.detail);
-                return;
+                if (!res.ok) {
+                    const err = await res.json();
+                    alert(err.detail || "Error solving Sudoku.");
+                    document.getElementById("loading").style.display = "none";
+                    return;
+                }
+
+                const data = await res.json();
+                document.getElementById("initialGrid").innerText = data.initial_grid;
+                document.getElementById("solvedGrid").innerText = data.solved_grid;
+                document.getElementById("status").innerText = data.status;
+
+            } catch (error) {
+                alert("Something went wrong: " + error.message);
             }
 
-            const data = await res.json();
-            document.getElementById("initialGrid").innerText = data.initial_grid;
-            document.getElementById("solvedGrid").innerText = data.solved_grid;
-            document.getElementById("status").innerText = data.status;
+            document.getElementById("loading").style.display = "none";
         }
     </script>
 </body>
