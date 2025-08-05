@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sudoku Solver</title>
+</head>
+<body>
+    <h1>Sudoku Solver</h1>
+    <input type="file" id="imageInput" accept="image/*" />
+    <button onclick="solveSudoku()">Solve</button>
+
+    <h2>Initial Grid</h2>
+    <pre id="initialGrid"></pre>
+
+    <h2>Solved Grid</h2>
+    <pre id="solvedGrid"></pre>
+
+    <h3 id="status"></h3>
+
+    <script>
+        async function solveSudoku() {
+            const fileInput = document.getElementById("imageInput");
+            if (!fileInput.files.length) {
+                alert("Please upload a Sudoku image.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            const res = await fetch("https://satyaprakashmohanty13-ssb.hf.space/solve", {
+                method: "POST",
+                body: formData
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                alert(err.detail);
+                return;
+            }
+
+            const data = await res.json();
+            document.getElementById("initialGrid").innerText = data.initial_grid;
+            document.getElementById("solvedGrid").innerText = data.solved_grid;
+            document.getElementById("status").innerText = data.status;
+        }
+    </script>
+</body>
+</html>
