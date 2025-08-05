@@ -31,7 +31,8 @@
         color: var(--gold-accent);
       }
       .btn-primary {
-        @apply bg-[var(--dark-navy)] text-[var(--gold-accent)] rounded-lg px-8 py-3 font-bold text-lg shadow-[0_0_15px_rgba(212,175,55,0.5)] transition-all duration-300 hover:shadow-[0_0_25px_rgba(212,175,55,0.8)] hover:scale-105;
+        /* Ensured button is on top of other elements */
+        @apply bg-[var(--dark-navy)] text-[var(--gold-accent)] rounded-lg px-8 py-3 font-bold text-lg shadow-[0_0_15px_rgba(212,175,55,0.5)] transition-all duration-300 hover:shadow-[0_0_25px_rgba(212,175,55,0.8)] hover:scale-105 relative z-20; /* Increased z-index */
       }
       .gold-border {
         border-color: var(--gold-accent);
@@ -208,6 +209,7 @@
         background-repeat: no-repeat;
         background-size: cover;
         background-position: 50% 50%;
+        z-index: 0; /* Ensured particles are in the background */
       }
       .bg-grid-gold {
         background-image:
