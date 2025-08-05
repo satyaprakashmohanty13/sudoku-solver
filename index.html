@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sudoku Solver</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&amp;family=Roboto:wght@300;400&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+      :root {
+        --royal-purple: #2c2a4a;
+        --deep-navy: #1a1a2e;
+        --gold-accent: #d4af37;
+        --light-beige: #f5f5dc;
+        --dark-navy: #0f0f1a;
+      }
+      body {
+        background: linear-gradient(135deg, var(--deep-navy), var(--royal-purple));
+        color: var(--light-beige);
+        overflow-x: hidden;
+      }
+      .font-serif {
+        font-family: 'Playfair Display', serif;
+      }
+      .font-sans {
+        font-family: 'Roboto', sans-serif;
+      }
+      .gold-text {
+        color: var(--gold-accent);
+      }
+      .btn-primary {
+        @apply bg-[var(--dark-navy)] text-[var(--gold-accent)] rounded-lg px-8 py-3 font-bold text-lg shadow-[0_0_15px_rgba(212,175,55,0.5)] transition-all duration-300 hover:shadow-[0_0_25px_rgba(212,175,55,0.8)] hover:scale-105;
+      }
+      .gold-border {
+        border-color: var(--gold-accent);
+      }
+      .gold-icon {
+        color: var(--gold-accent);
+        font-size: 3rem;
+      }
+      .feature-card {
+        @apply bg-white/5 border border-white/10 rounded-xl p-6 text-center backdrop-blur-sm transition-all duration-300 hover:bg-white/10 hover:border-white/20 hover:-translate-y-2;
+      }
+      .gold-outline-icon {
+        @apply text-transparent;
+        -webkit-text-stroke: 1px var(--gold-accent);
+      }
+    </style>
+</head>
+<body class="font-sans">
+<header class="fixed top-0 left-0 w-full bg-[var(--deep-navy)]/80 backdrop-blur-md z-50 shadow-lg border-b border-[var(--gold-accent)]/20">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex items-center justify-between h-16">
+<div class="flex items-center">
+<a class="flex items-center" href="#">
+<svg class="h-8 w-8 text-[var(--gold-accent)] mr-2" fill="currentColor" height="48" viewBox="0 0 16 16" width="48" xmlns="http://www.w3.org/2000/svg">
+<path d="M1 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1zM1 7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1zM1 12a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1z"></path>
+</svg>
+<span class="font-serif text-2xl font-bold gold-text">Sudoku Solver</span>
+</a>
+</div>
+</div>
+</div>
+</header>
+<div class="relative min-h-screen pt-16">
+<div class="absolute inset-0 z-0" id="particles-js"></div>
+<section class="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4 py-20 overflow-hidden">
+<div class="absolute inset-0 bg-grid-gold opacity-10"></div>
+<div class="max-w-4xl mx-auto">
+<div class="gold-icon mb-6">
+<svg class="bi bi-grid-3x3-gap-fill inline-block" fill="currentColor" height="96" viewBox="0 0 16 16" width="96" xmlns="http://www.w3.org/2000/svg">
+<path d="M1 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1zM1 7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1zM1 12a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1z"></path>
+</svg>
+</div>
+<h1 class="font-serif text-6xl md:text-8xl font-black gold-text mb-4">Solve Any Sudoku in Seconds</h1>
+<p class="text-xl md:text-2xl font-light text-[var(--light-beige)] mb-8 max-w-2xl mx-auto">
+            Upload your puzzle and get instant solutions with AI
+          </p>
+<button class="btn-primary" onclick="window.location.href='main.html'">
+    Try It Now
+</button>
+</div>
+</section>
+<section class="relative z-10 py-24 px-4 sm:px-6 lg:px-8">
+<div class="max-w-7xl mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+<div class="feature-card">
+<div class="gold-icon mb-4">
+<svg fill="currentColor" height="48" viewBox="0 0 256 256" width="48" xmlns="http://www.w3.org/2000/svg">
+<path d="M216,48V32a16,16,0,0,0-16-16H184a16,16,0,0,0-16,16V41.37a80.12,80.12,0,0,0-112,0V32A16,16,0,0,0,40,16H24A16,16,0,0,0,8,32V48A80.09,80.09,0,0,0,64.63,120.4a40.23,40.23,0,0,0-4.06,16.51A48,48,0,0,0,104,184v24a16,16,0,0,0,16,16h16a16,16,0,0,0,16-16V184a48,48,0,0,0,43.43-47.09,40.23,40.23,0,0,0-4.06-16.51A80.09,80.09,0,0,0,248,48ZM24,32H40V64H24ZM128,208H112V184a32,32,0,0,1,16,0Zm88-160V64H168v8a24,24,0,0,0,48,0v8H200V64h16Zm-24,32a8,8,0,0,1-16,0V88a8,8,0,0,1,16,0Zm-48-8V80a8,8,0,0,1,16,0v8a8,8,0,0,1-16,0ZM96,88a8,8,0,0,1,16,0v8a8,8,0,0,1-16,0ZM48,88V80a8,8,0,0,1,16,0v8a8,8,0,0,1-16,0ZM112.92,120A64.1,64.1,0,0,1,24,66.5V80a40,40,0,0,0,70.55,28.45A48.51,48.51,0,0,0,88,136.91,32,32,0,0,1,112,168v1.37a80.12,80.12,0,0,0,32,0V168a32,32,0,0,1,24-31.09,48.51,48.51,0,0,0-6.55-11.54A40,40,0,0,0,232,80V66.5A64.1,64.1,0,0,1,143.08,120Z"></path>
+</svg>
+</div>
+<h3 class="text-xl font-serif font-bold gold-text mb-2">Instant Solutions</h3>
+<p class="text-[var(--light-beige)]/80 font-light">Get solutions in seconds with our advanced AI.</p>
+</div>
+<div class="feature-card">
+<div class="gold-icon mb-4">
+<svg fill="currentColor" height="48" viewBox="0 0 256 256" width="48" xmlns="http://www.w3.org/2000/svg">
+<path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z"></path>
+</svg>
+</div>
+<h3 class="text-xl font-serif font-bold gold-text mb-2">Supports Handwritten &amp; Digital</h3>
+<p class="text-[var(--light-beige)]/80 font-light">Works with both handwritten and digital puzzles.</p>
+</div>
+<div class="feature-card">
+<div class="gold-icon mb-4">
+<svg fill="currentColor" height="48" viewBox="0 0 256 256" width="48" xmlns="http://www.w3.org/2000/svg">
+<path d="M176,16H80A24,24,0,0,0,56,40V216a24,24,0,0,0,24,24h96a24,24,0,0,0,24-24V40A24,24,0,0,0,176,16ZM80,32h96a8,8,0,0,1,8,8V192H72V40A8,8,0,0,1,80,32Zm96,192H80a8,8,0,0,1-8-8v-8H184v8A8,8,0,0,1,176,224Z"></path>
+</svg>
+</div>
+<h3 class="text-xl font-serif font-bold gold-text mb-2">Mobile Friendly</h3>
+<p class="text-[var(--light-beige)]/80 font-light">Access and solve puzzles on any mobile device.</p>
+</div>
+<div class="feature-card">
+<div class="gold-icon mb-4">
+<svg fill="currentColor" height="48" viewBox="0 0 256 256" width="48" xmlns="http://www.w3.org/2000/svg">
+<path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm40-68a28,28,0,0,1-28,28h-4v8a8,8,0,0,1-16,0v-8H104a8,8,0,0,1,0-16h36a12,12,0,0,0,0-24H116a28,28,0,0,1,0-56h4V72a8,8,0,0,1,16,0v8h16a8,8,0,0,1,0,16H116a12,12,0,0,0,0,24h24A28,28,0,0,1,168,148Z"></path>
+</svg>
+</div>
+<h3 class="text-xl font-serif font-bold gold-text mb-2">Free &amp; Easy to Use</h3>
+<p class="text-[var(--light-beige)]/80 font-light">Enjoy solving puzzles for free with our easy-to-use interface.</p>
+</div>
+</div>
+</div>
+</section>
+<section class="relative z-10 py-24 px-4 sm:px-6 lg:px-8">
+<div class="max-w-4xl mx-auto text-center">
+<h2 class="font-serif text-5xl font-black gold-text mb-12">How It Works</h2>
+<div class="relative">
+<div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-white/10 -translate-y-1/2"></div>
+<div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-[var(--gold-accent)] -translate-y-1/2 animate-pulse"></div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+<div class="relative">
+<div class="flex items-center justify-center w-24 h-24 mx-auto mb-4 border-2 border-[var(--gold-accent)] rounded-full bg-[var(--deep-navy)] shadow-lg">
+<span class="font-serif text-3xl font-bold gold-text">1</span>
+</div>
+<h3 class="text-xl font-serif font-bold gold-text mb-2">Upload Image</h3>
+<p class="text-[var(--light-beige)]/80 font-light">Step 1: Upload your Sudoku image.</p>
+</div>
+<div class="relative">
+<div class="flex items-center justify-center w-24 h-24 mx-auto mb-4 border-2 border-[var(--gold-accent)] rounded-full bg-[var(--deep-navy)] shadow-lg">
+<span class="font-serif text-3xl font-bold gold-text">2</span>
+</div>
+<h3 class="text-xl font-serif font-bold gold-text mb-2">AI Detection</h3>
+<p class="text-[var(--light-beige)]/80 font-light">Step 2: AI detects the puzzle.</p>
+</div>
+<div class="relative">
+<div class="flex items-center justify-center w-24 h-24 mx-auto mb-4 border-2 border-[var(--gold-accent)] rounded-full bg-[var(--deep-navy)] shadow-lg">
+<span class="font-serif text-3xl font-bold gold-text">3</span>
+</div>
+<h3 class="text-xl font-serif font-bold gold-text mb-2">View Solution</h3>
+<p class="text-[var(--light-beige)]/80 font-light">Step 3: View the solved Sudoku instantly.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="relative z-10 py-24 px-4 sm:px-6 lg:px-8">
+<div class="max-w-4xl mx-auto text-center">
+<h2 class="font-serif text-5xl font-black gold-text mb-12">What Our Users Say</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="bg-white/5 border border-white/10 rounded-xl p-8 backdrop-blur-sm">
+<div class="flex items-center mb-4">
+<img alt="Sophia Bennett" class="w-16 h-16 rounded-full mr-4 border-2 border-[var(--gold-accent)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCx5-kXSyF2TNy_tEVYfswCnTIBAIGAFBQ29l-ahSWjSQm5mYJjz76NfY0A0Zs1DXKgQtTqx-SpCcwkJlJ_YryX055IVmgvwIa9mLFiF9hEXJJAuac40UyLKl8iFb-brPPXxY_zhZDIo6cw50hNPGGnZ913S3uVYWjUHQEZI-1CEuMMJzYLWl_LmPqytJ7E0f8FBvHzzygW58Y0mJxzOu2xWELxEQVLApzdrsZ9wcy3d7N39npf_8siF1784RfVb1CAJYl7ElavAOqV"/>
+<div>
+<h4 class="font-serif text-lg font-bold gold-text">Sophia Bennett</h4>
+<p class="text-sm text-[var(--light-beige)]/60">Enthusiast</p>
+</div>
+</div>
+<p class="text-[var(--light-beige)]/80 font-light italic">"This Sudoku solver is a game-changer! I can now solve puzzles in seconds, and it's so easy to use. Highly recommended!"</p>
+</div>
+<div class="bg-white/5 border border-white/10 rounded-xl p-8 backdrop-blur-sm">
+<div class="flex items-center mb-4">
+<img alt="Ethan Carter" class="w-16 h-16 rounded-full mr-4 border-2 border-[var(--gold-accent)]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWCbbhcsfHcAJqLHRAsbqKiXzJX6Oy0QoEkEy8Aii_V7Vl0gCL-onhzeoIyQ-91lE2Q53RT3pX_WBtjL5SF7eD6YC5YO7OgJynoh69SaS3nk4IsaxNmlhPe_scOgncPgHByiFzC8BdkmULBbX70HY-Qn4Wxo5e1WWmCSu6bdhcGiIAM5CAM0kyiSA1bTgQkadd46loV1xQgvzzmyC_IiRem0CH5O0fZNlBkzbPHX-Kar1mTo9nDvsi912bVWFZ_b5fCN_sQY02Umrz"/>
+<div>
+<h4 class="font-serif text-lg font-bold gold-text">Ethan Carter</h4>
+<p class="text-sm text-[var(--light-beige)]/60">Pro Solver</p>
+</div>
+</div>
+<p class="text-[var(--light-beige)]/80 font-light italic">"I love how quickly and accurately this solver works. It's perfect for both beginners and advanced players. A must-have tool!"</p>
+</div>
+</div>
+</div>
+</section>
+<section class="relative z-10 py-24 text-center px-4">
+<div class="max-w-4xl mx-auto">
+<h2 class="font-serif text-5xl md:text-6xl font-black gold-text mb-6">Ready to Solve Your Sudoku?</h2>
+<button class="btn-primary" onclick="window.location.href='main.html'">
+    Start Solving Now
+</button>
+</div>
+</section>
+<footer class="relative z-10 mt-24 border-t border-[var(--gold-accent)]/20 py-8 px-4">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between text-center md:text-left">
+<p class="text-sm text-[var(--light-beige)]/60 mb-4 md:mb-0">© 2024 Sudoku Solver. All rights reserved.</p>
+<div class="flex items-center space-x-6">
+<a class="text-[var(--light-beige)]/60 hover:gold-text transition-colors" href="#"><svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160ZM176,24H80A56.06,56.06,0,0,0,24,80v96a56.06,56.06,0,0,0,56,56h96a56.06,56.06,0,0,0,56-56V80A56.06,56.06,0,0,0,176,24Zm40,152a40,40,0,0,1-40,40H80a40,40,0,0,1-40-40V80A40,40,0,0,1,80,40h96a40,40,0,0,1,40,40ZM192,76a12,12,0,1,1-12-12A12,12,0,0,1,192,76Z"></path></svg></a>
+<a class="text-[var(--light-beige)]/60 hover:gold-text transition-colors" href="#"><svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M232,56a16,16,0,0,0-16-16H40A16,16,0,0,0,24,56V184a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16ZM94.2,128,40,167.31V72.69ZM101.4,136h53.2l55.4,36H46Zm-2.9-3.4L40,88.69,98.5,128ZM161.8,128,216,72.69v94.62ZM154.6,136h-53.2l-6-4.5,52.1-39,52.1,39Z"></path></svg></a>
+<a class="text-[var(--light-beige)]/60 hover:gold-text transition-colors" href="#"><svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M240,128c0,61.76-50.24,112-112,112S16,189.76,16,128,66.24,16,128,16,240,66.24,240,128ZM128,40a88,88,0,1,0,88,88A88.1,88.1,0,0,0,128,40Zm24.49,67.51a12,12,0,1,1-17,17L128,117.05l-7.51-7.54a12,12,0,0,1,17-17l15,15.05L175,85.51a12,12,0,1,1,17,17Z"></path></svg></a>
+</div>
+</div>
+</footer>
+</div>
+<style>
+      #particles-js {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-image: url('');
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: 50% 50%;
+      }
+      .bg-grid-gold {
+        background-image:
+          linear-gradient(to right, rgba(212, 175, 55, 0.1) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(212, 175, 55, 0.1) 1px, transparent 1px);
+        background-size: 3rem 3rem;
+      }
+    </style>
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script>
+      particlesJS("particles-js", {
+        "particles": {
+          "number": {
+            "value": 30,
+            "density": {
+              "enable": true,
+              "value_area": 800
+            }
+          },
+          "color": {
+            "value": "#d4af37"
+          },
+          "shape": {
+            "type": "circle",
+            "stroke": {
+              "width": 0,
+              "color": "#000000"
+            },
+            "polygon": {
+              "nb_sides": 5
+            }
+          },
+          "opacity": {
+            "value": 0.5,
+            "random": true,
+            "anim": {
+              "enable": true,
+              "speed": 1,
+              "opacity_min": 0.1,
+              "sync": false
+            }
+          },
+          "size": {
+            "value": 2,
+            "random": true,
+            "anim": {
+              "enable": false,
+              "speed": 40,
+              "size_min": 0.1,
+              "sync": false
+            }
+          },
+          "line_linked": {
+            "enable": false,
+          },
+          "move": {
+            "enable": true,
+            "speed": 1,
+            "direction": "none",
+            "random": true,
+            "straight": false,
+            "out_mode": "out",
+            "bounce": false,
+            "attract": {
+              "enable": false,
+              "rotateX": 600,
+              "rotateY": 1200
+            }
+          }
+        },
+        "interactivity": {
+          "detect_on": "canvas",
+          "events": {
+            "onhover": {
+              "enable": false,
+            },
+            "onclick": {
+              "enable": false,
+            },
+            "resize": true
+          }
+        },
+        "retina_detect": true
+      });
+    </script>
+</body></html>
